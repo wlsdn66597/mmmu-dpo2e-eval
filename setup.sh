@@ -5,13 +5,11 @@
 set -euo pipefail
 cd "$(dirname "$0")"; ROOT=$PWD
 
-HARNESS_REPO=https://github.com/wlsdn66597/mmdl-baseline.git
-HARNESS_COMMIT=7740786a1b6b173db86285a00f06e93a44d8a225
 export HF_HUB_DISABLE_TELEMETRY=1 PYTHONUNBUFFERED=1
 export GIT_TERMINAL_PROMPT=0  # 백그라운드에서 git이 입력을 기다리며 멈추지 않고 바로 오류를 내도록
 export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"  # uv 설치 직후 셸을 새로 열지 않아도 찾도록
 log() { echo "[$(date '+%m-%d %H:%M:%S')] $*"; }
-for c in git nvidia-smi; do command -v "$c" >/dev/null || { log "$c 명령이 없다"; exit 1; }; done
+for c in nvidia-smi; do command -v "$c" >/dev/null || { log "$c 명령이 없다"; exit 1; }; done
 nvidia-smi --query-gpu=name,memory.used,memory.total --format=csv,noheader
 
 # 1. Python 3.12 가상환경
@@ -33,12 +31,13 @@ if [ ! -f .venv/.deps_ok ]; then
   touch .venv/.deps_ok
 fi
 
-# 3. 평가 하네스 (E가 MMMU-val을 평가한 코드 그대로)
-if [ ! -d harness/.git ]; then
-  log "3. 평가 하네스 받기"
-  git clone -q "$HARNESS_REPO" harness
+# 3. 평가 하네스 (E가 MMMU-val을 평가한 코드 그대로. mmdl-baseline @7740786의 파일을 harness_src/에 넣어 두었다)
+if [ ! -f harness/.ok ]; then
+  log "3. 평가 하네스 준비"
+  rm -rf harness harness_split; mkdir harness
+  cp -a harness_src/src harness_src/THIRD_PARTY_LICENSES.txt env/requirements.txt harness/
+  touch harness/.ok
 fi
-git -C harness checkout -q "$HARNESS_COMMIT"
 "$PY" -I scripts/check_harness.py harness
 
 # 4. test용 하네스 복사본 (바꾼 곳은 harness_split/PATCH_NOTES.md)

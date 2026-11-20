@@ -24,7 +24,7 @@ nohup bash run_test.sh ~/DPO2E_repro_adapter_eval.zip 1234 > test_1234.log 2>&1 
 | OS | Linux x86-64 (하네스가 확인한다) |
 | GPU | 24GB 1장, bf16 지원 (E는 RTX 4090). 평가 중 다른 프로세스가 GPU를 쓰지 않을 것 |
 | Python | 3.12 (`python3.12`가 없으면 `uv`로 만든다) |
-| 기타 | git, 인터넷, 디스크 약 60GB |
+| 기타 | git, 인터넷, 디스크 약 60GB. GitHub 로그인은 필요 없다 |
 | 시간 | E의 val 900문항이 약 5.5시간이었다. test 10,500문항은 60시간 이상 예상 |
 
 ## 구성
@@ -33,6 +33,7 @@ nohup bash run_test.sh ~/DPO2E_repro_adapter_eval.zip 1234 > test_1234.log 2>&1 
 |---|---|
 | `setup.sh` | 가상환경(`.venv`), 패키지, 하네스(`harness/`), test용 복사본(`harness_split/`), 모델·데이터 다운로드 |
 | `run_test.sh` | zip 풀기(`dpo2e/`), 병합(`dpo2e/merged/`), 평가·채점 |
+| `harness_src/` | E가 MMMU-val을 평가한 하네스 코드 (mmdl-baseline 커밋 `7740786`의 `src/` 5개 파일과 라이선스 고지, 수정 없음) |
 | `env/requirements.txt` | 하네스의 고정 패키지 목록 (vLLM 0.11.0, torch 2.8.0, transformers 4.57.0 등 157개) |
 | `env/requirements_merge.txt` | 병합용 peft 0.17.1, accelerate 1.10.1 (E 학습 환경과 같은 버전) |
 | `scripts/check_harness.py` | 하네스 코드 5개가 E 평가 기록의 SHA-256과 같은지 확인 |
@@ -44,7 +45,7 @@ nohup bash run_test.sh ~/DPO2E_repro_adapter_eval.zip 1234 > test_1234.log 2>&1 
 ## E 평가와 같은 것, 바꾼 것
 
 같은 것
-- 평가 하네스: `wlsdn66597/mmdl-baseline` 커밋 `7740786` (E manifest의 git_commit, 코드 해시 확인)
+- 평가 하네스: mmdl-baseline 커밋 `7740786` (E manifest의 git_commit). `harness_src/`에 넣어 두었고, setup.sh가 코드 5개의 SHA-256이 E 기록과 같은지 확인한다
 - 베이스 `Qwen/Qwen3-VL-4B-Instruct@ebb281ec`, 데이터 `MMMU/MMMU@98e6ac0c`, 판정 `Qwen/Qwen3-8B@b968826d`
 - 프롬프트, temperature 0.7 / top_p 0.8 / top_k 20 / presence_penalty 1.5, 출력 상한 32,768, 문맥 64,000
 - 이미지 min_pixels 1,003,520 / max_pixels 4,014,080, 1문항씩 생성, 판정 최대 25번, 채점 규칙
