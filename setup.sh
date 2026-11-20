@@ -8,6 +8,7 @@ cd "$(dirname "$0")"; ROOT=$PWD
 HARNESS_REPO=https://github.com/wlsdn66597/mmdl-baseline.git
 HARNESS_COMMIT=7740786a1b6b173db86285a00f06e93a44d8a225
 export HF_HUB_DISABLE_TELEMETRY=1 PYTHONUNBUFFERED=1
+export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"  # uv 설치 직후 셸을 새로 열지 않아도 찾도록
 log() { echo "[$(date '+%m-%d %H:%M:%S')] $*"; }
 for c in git nvidia-smi; do command -v "$c" >/dev/null || { log "$c 명령이 없다"; exit 1; }; done
 nvidia-smi --query-gpu=name,memory.used,memory.total --format=csv,noheader
@@ -17,7 +18,7 @@ if [ ! -x .venv/bin/python ]; then
   log "1. Python 3.12 가상환경 만들기"
   if command -v python3.12 >/dev/null && python3.12 -m venv .venv; then :
   elif command -v uv >/dev/null; then rm -rf .venv; uv venv -q --python 3.12 --seed .venv
-  else rm -rf .venv; log "Python 3.12이 필요하다 (Ubuntu: sudo apt install python3.12 python3.12-venv, 또는 uv 설치)"; exit 1
+  else rm -rf .venv; log "Python 3.12이 필요하다. sudo 없이: curl -LsSf https://astral.sh/uv/install.sh | sh 후 다시 실행"; exit 1
   fi
 fi
 PY=$ROOT/.venv/bin/python
