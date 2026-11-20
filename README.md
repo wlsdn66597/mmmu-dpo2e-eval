@@ -6,7 +6,7 @@
 ## 실행
 
 ```bash
-git clone <이 저장소 주소> mmmu-dpo2e-eval
+git clone https://github.com/wlsdn66597/mmmu-dpo2e-eval.git
 cd mmmu-dpo2e-eval
 bash setup.sh                                   # 환경 + 하네스 + 모델·데이터 (한 번만)
 nohup bash run_test.sh ~/DPO2E_repro_adapter_eval.zip 1234 > test_1234.log 2>&1 &
