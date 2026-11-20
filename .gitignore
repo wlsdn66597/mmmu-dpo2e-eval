@@ -1,0 +1,7 @@
+.venv/
+harness/
+harness_split/
+dpo2e/
+*.zip
+*.log
+__pycache__/
