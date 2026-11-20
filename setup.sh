@@ -8,6 +8,7 @@ cd "$(dirname "$0")"; ROOT=$PWD
 HARNESS_REPO=https://github.com/wlsdn66597/mmdl-baseline.git
 HARNESS_COMMIT=7740786a1b6b173db86285a00f06e93a44d8a225
 export HF_HUB_DISABLE_TELEMETRY=1 PYTHONUNBUFFERED=1
+export GIT_TERMINAL_PROMPT=0  # 백그라운드에서 git이 입력을 기다리며 멈추지 않고 바로 오류를 내도록
 export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"  # uv 설치 직후 셸을 새로 열지 않아도 찾도록
 log() { echo "[$(date '+%m-%d %H:%M:%S')] $*"; }
 for c in git nvidia-smi; do command -v "$c" >/dev/null || { log "$c 명령이 없다"; exit 1; }; done
