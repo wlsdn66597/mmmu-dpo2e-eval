@@ -12,6 +12,9 @@ bash setup.sh                                   # 환경 + 하네스 + 모델·�
 nohup bash run_test.sh ~/DPO2E_repro_adapter_eval.zip 1234 > test_1234.log 2>&1 &
 ```
 
+- MMMU val(900문항)은 앞에 `SPLIT=validation`을 붙인다. seed 3407이면 E의 val 평가 설정과 완전히 같다 (E 재현 모델 602/900).
+  `SPLIT=validation nohup bash run_test.sh ~/DPO2E_repro_adapter_eval.zip 3407 > val_3407.log 2>&1 &`
+  val 데이터가 캐시에 없으면 먼저 받는다. 결과는 `harness_split/outputs/dpo2E_val_seed<seed>/`
 - 둘 다 끊기면 같은 명령을 다시 실행하면 끝난 단계는 건너뛰고 이어서 한다.
 - 결과: `harness_split/outputs/dpo2E_test_seed<seed>/scores.md`(과목별·전체 점수), `summary.json`, `predictions.jsonl`(문항별 응답), `results.json`(채점 포함)
 - seed를 바꿔 여러 번 돌릴 때는 `run_test.sh`만 다시 실행한다. 병합 모델과 다운로드는 다시 하지 않는다.
