@@ -6,6 +6,7 @@
 #
 # 사용 (repo 폴더에서, setup.sh와 run_test.sh 한 번 이상 실행해 dpo2e/ 가 풀려 있어야 함):
 #   setsid nohup bash ablation/run_ablations.sh <pairs_E.jsonl> <이미지 루트> > ablation.log 2>&1 < /dev/null &
+#   - 팀원 묶음(pairs_E_bundle.tar)을 ~/pairsE 에 풀었다면: ~/pairsE/pairs_E.jsonl ~/pairsE/vic_era_2000
 #   - 쌍 파일은 E 재현 학습과 같은 것(2,307행, md5 9b7b6d94…)이어야 한다. 다르면 멈춘다 (FORCE=1 로 무시).
 #   - 일부만: ONLY="prefix novision" bash ablation/run_ablations.sh …
 # 끊기면 같은 명령으로 다시 실행: 병합까지 끝난 학습과 채점까지 끝난 평가는 건너뛴다.
@@ -99,9 +100,9 @@ evaluate() {  # name
 
 for job in $JOBS; do
   case $job in
-    prefix)   train prefix   "$PAIRS"      1 --vision-lora --gates --img-pref-types V,I && evaluate prefix || true ;;
+    prefix)   train prefix   "$W/pairs_full.jsonl"      1 --vision-lora --gates --img-pref-types V,I && evaluate prefix || true ;;
     mainonly) train mainonly "$W/pairs_loop_only.jsonl" 0 && evaluate mainonly || true ;;
-    novision) train novision "$PAIRS"      0 && evaluate novision || true ;;
+    novision) train novision "$W/pairs_full.jsonl"      0 && evaluate novision || true ;;
     *) log "알 수 없는 job: $job" ;;
   esac
 done

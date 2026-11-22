@@ -77,7 +77,7 @@ nohup bash run_test.sh ~/DPO2E_repro_adapter_eval.zip 1234 > test_1234.log 2>&1 
 `ablation/run_ablations.sh`가 변형 3개를 차례로 학습 → 병합 → val 평가한다. E 학습 코드는 E zip의 `code/`를 복사해 작업 폴더에서만 고친다 (`ablation/prep.py` 참고). 다음 두 가지가 필요하다.
 
 1. setup.sh, run_test.sh를 한 번 돌려 `dpo2e/`가 풀려 있는 상태
-2. E가 학습한 쌍 파일 `pairs_E.jsonl` (2,307행, md5 `9b7b6d94abae89ee5862ced67d3c69c2`)과 그 쌍의 `image` 경로가 가리키는 이미지 폴더
+2. E가 학습한 쌍 파일 `pairs_E.jsonl` (2,307행, md5 `9b7b6d94abae89ee5862ced67d3c69c2`)과 그 쌍의 `image` 경로가 가리키는 이미지 폴더. 팀원 묶음 `pairs_E_bundle.tar`를 `~/pairsE`에 풀면 `~/pairsE/pairs_E.jsonl ~/pairsE/vic_era_2000`을 주면 된다 (loop 쌍의 절대 경로는 묶음의 `mmdl/`로 자동으로 바꾼다)
 
 | 이름 | E와 다른 점 |
 |---|---|

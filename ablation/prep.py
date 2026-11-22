@@ -8,7 +8,7 @@
 - train_sft.py: train_dpo_d.py가 가져다 쓰는 LORA_TARGET, BASE_FILES, md5 만 담은 최소 모듈
 - training_settings_only.json: E의 train_info.json 'vision' 설정 그대로
 """
-import hashlib, json, shutil, sys
+import hashlib, json, os, shutil, sys
 from pathlib import Path
 
 repo, pairs, images, work = (Path(a) for a in sys.argv[1:5])
@@ -32,16 +32,25 @@ if h != info["pairs_md5"] or len(rows) != info["n_pairs"]:
     if "--force" not in sys.argv:
         fail("E가 학습한 쌍 파일과 다르다. 그래도 진행하려면 FORCE=1 로 실행")
     print("[prep] 경고: E와 다른 쌍 파일로 진행 (FORCE=1)")
+# loop 쌍은 E 학습 서버의 절대 경로(/shared_dir/friend_dpo_r4/x/...)를 가리킨다. 팀원 묶음(pairs_E_bundle.tar)은
+# 같은 구조를 쌍 파일 옆 mmdl/ 에 두었으므로 그쪽으로 바꾼다. 다른 위치면 IMG_REMAP="옛접두어=새접두어"
+old, new = (os.environ.get("IMG_REMAP") or f"/shared_dir/friend_dpo_r4/x/={pairs.parent / 'mmdl'}/").split("=", 1)
+n_remap = 0
+for r in rows:
+    if r["image"].startswith(old):
+        r["image"] = new + r["image"][len(old):]; n_remap += 1
+print(f"[prep] 이미지 절대 경로 {n_remap}행: {old} → {new}")
 missing = [r["image"] for r in rows if not (images / r["image"]).is_file()]
 if missing:
-    fail(f"이미지 {len(missing)}개가 {images} 아래에 없다. 예: {missing[:3]}")
+    fail(f"이미지 {len(missing)}개가 없다 (상대 경로는 {images} 기준). 예: {missing[:3]}")
 loop_rows = [r for r in rows if r.get("kind") != "replay" and r.get("rej_span_char") is not None]
 print(f"[prep] loop 쌍(rej_span 있음) {len(loop_rows)}행, replay {sum(r.get('kind') == 'replay' for r in rows)}행, "
       f"나머지(ERA 쌍) {len(rows) - len(loop_rows) - sum(r.get('kind') == 'replay' for r in rows)}행")
 if len(loop_rows) != 1304 and "--force" not in sys.argv:
     fail(f"loop 쌍이 1,304행이어야 하는데 {len(loop_rows)}행이다")
 
-# ---- 2. loop 쌍만 뽑은 파일 (mainonly용. 나머지 변형은 원래 쌍 파일을 그대로 쓴다)
+# ---- 2. 학습용 쌍 파일 (이미지 경로만 바꾼 전체, loop 쌍만 뽑은 mainonly용)
+(work / "pairs_full.jsonl").write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows), encoding="utf-8")
 (work / "pairs_loop_only.jsonl").write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in loop_rows),
                                             encoding="utf-8")
 
