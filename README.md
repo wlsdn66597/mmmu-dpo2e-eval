@@ -71,3 +71,22 @@ nohup bash run_test.sh ~/DPO2E_repro_adapter_eval.zip 1234 > test_1234.log 2>&1 
 
 - 판정 입력이 판정 모델 문맥(32,768)을 넘으면 하네스가 멈춘다 (E 하네스 그대로). 답 줄 없이 아주 길게 끝난 응답에서만 생긴다.
 - 같은 seed라도 GPU·드라이버가 다르면 응답이 일부 달라질 수 있다.
+
+## Ablation (E recipe, MMMU val seed 3407)
+
+`ablation/run_ablations.sh`가 변형 3개를 차례로 학습 → 병합 → val 평가한다. E 학습 코드는 E zip의 `code/`를 복사해 작업 폴더에서만 고친다 (`ablation/prep.py` 참고). 다음 두 가지가 필요하다.
+
+1. setup.sh, run_test.sh를 한 번 돌려 `dpo2e/`가 풀려 있는 상태
+2. E가 학습한 쌍 파일 `pairs_E.jsonl` (2,307행, md5 `9b7b6d94abae89ee5862ced67d3c69c2`)과 그 쌍의 `image` 경로가 가리키는 이미지 폴더
+
+| 이름 | E와 다른 점 |
+|---|---|
+| prefix | loop 쌍의 rejected 점수를 loop onset이 아니라 응답 처음부터 계산 (입력 토큰은 같음) |
+| mainonly | loop 쌍 ×4 + chosen NLL만 학습 (ERA 쌍·replay·시각 연결부 LoRA·gate·이미지 조건 손실 제거) |
+| novision | 시각 연결부 LoRA·gate·이미지 조건 손실만 제거 |
+
+```bash
+CC=$HOME/bin/cc setsid nohup bash ablation/run_ablations.sh <pairs_E.jsonl> <이미지 루트> > ablation.log 2>&1 < /dev/null &
+```
+
+GPU에 다른 평가가 돌고 있으면 끝날 때까지 5분마다 기다렸다가 시작한다. 끊기면 같은 명령으로 다시 실행하면 이어서 한다. 결과 표는 `ablation_work/ablation_summary.md`(E 재현 val 결과와 함께).

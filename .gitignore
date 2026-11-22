@@ -5,3 +5,4 @@ dpo2e/
 *.zip
 *.log
 __pycache__/
+ablation_work/
