@@ -107,6 +107,6 @@ for job in $JOBS; do
   esac
 done
 
-"$PY" -I ablation/summarize.py "$ROOT/harness_split/outputs" dpo2E_val_seed3407 \
-  $(for j in $JOBS; do echo "abl_${j}_val_seed3407"; done) > "$W/ablation_summary.md"
+"$PY" -I ablation/summarize.py dpo2e/eval_mmmu_val \
+  $(for j in $JOBS; do echo "harness_split/outputs/abl_${j}_val_seed3407"; done) > "$W/ablation_summary.md"
 log "모두 끝. 표: $W/ablation_summary.md"; cat "$W/ablation_summary.md"
