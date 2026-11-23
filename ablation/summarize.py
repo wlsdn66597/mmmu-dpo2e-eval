@@ -20,4 +20,4 @@ for d in sys.argv[1:]:
     parsed = [r for r in recs if r["grading"]["final"]["method"].startswith("explicit_final")]
     pacc = sum(bool(r["grading"]["final"]["hit"]) for r in parsed)
     only = sum(bool(re.fullmatch(r"\s*Final answer:\s*\S+\s*", r["model_response"]["raw"])) for r in recs)
-    print(f"| {run} | {hit} | {length} | {med} | {100 * pacc / max(1, len(parsed)):.1f}% ({pacc}/{len(parsed)}) | {only} |")
+    print(f"| {run} | {hit} | {length} | {med} | {100 * pacc / max(1, len(parsed)):.2f}% ({pacc}/{len(parsed)}) | {only} |")
